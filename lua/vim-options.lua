@@ -54,3 +54,6 @@ vim.api.nvim_create_autocmd("TermOpen", {
 
 --rename a variable 
 vim.api.nvim_set_keymap('n', '<leader>rn', '<cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true, silent = true })
+
+--closing a buffer ( bufferline plugin ) 
+vim.keymap.set("n", '<leader>x', '<cmd> bd<CR>')
