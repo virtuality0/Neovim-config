@@ -25,8 +25,9 @@ return {
           vim.keymap.set(mode, lhs, rhs, { buffer = bufnr })
         end
         buf_map("n", "K", vim.lsp.buf.hover)
-        buf_map("n", "<leader>gd", vim.lsp.buf.definition)
-        buf_map("n", "<leader>gr", vim.lsp.buf.references)
+        buf_map("n", "<leader>gd", "<cmd>Telescope lsp_definitions<cr>")
+        buf_map("n", "<leader>gr", "<cmd>Telescope lsp_references<cr>")
+        buf_map("n", "<leader>gi", "<cmd>Telescope lsp_implementatons<cr>")
         buf_map("n", "<leader>ca", vim.lsp.buf.code_action)
       end
 
@@ -41,6 +42,17 @@ return {
       lspconfig.gopls.setup({
         capabilities = capabilities,
         on_attach = on_attach,
+        cmd = {"gopls"},
+        filetypes = {"go", "gomod", "gowork", "gotmpl"},
+        settings = {
+          gopls = {
+            completeUnimported = true,
+            usePlaceholders = true,
+            analyses = {
+              unusedParams = true
+            }
+          }
+        }
       })
 
       -- Python

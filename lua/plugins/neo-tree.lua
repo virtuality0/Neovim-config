@@ -21,6 +21,9 @@ return {
         },
       },
     },
+    filesystem = {
+      use_libuv_file_watcher = true
+    },
   },
   config = function(_, opts)
     require('neo-tree').setup(opts)

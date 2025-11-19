@@ -8,7 +8,7 @@ return {
         typescriptreact = { "prettier" },
         javascriptreact = { "prettier" },
         go = { "gofmt" },
-        python = { "black" },
+        python = { args = { "--indent-size=2" }, exe = "autopep8" },
         html = { "prettier" },
         css = { "prettier" },
         json = { "prettier" },
