@@ -5,12 +5,12 @@ if not vim.loop.fs_stat(lazypath) then
     "clone",
     "--filter=blob:none",
     "https://github.com/folke/lazy.nvim.git",
-    "--branch=stable", 
+    "--branch=stable",
     lazypath,
   })
 end
 vim.opt.rtp:prepend(lazypath)
-vim.opt.encoding="utf8"
-vim.opt.fileencoding="utf-8"
+vim.opt.encoding = "utf8"
+vim.opt.fileencoding = "utf-8"
 require("vim-options")
 require("lazy").setup("plugins")
