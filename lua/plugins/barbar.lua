@@ -12,11 +12,10 @@ return {
       -- your barbar options here!
     }
 
-vim.api.nvim_set_keymap('n', '<Tab>', '<Cmd>BufferNext<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<Tab>', '<Cmd>BufferNext<CR>', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<S-Tab>', '<Cmd>BufferPrevious<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '<S-Tab>', '<Cmd>BufferPrevious<CR>', { noremap = true, silent = true })
 
-vim.api.nvim_set_keymap('n', '<leader>x', ':BufferClose<CR>', { noremap = true, silent = true })
-    
+    vim.api.nvim_set_keymap('n', '<leader>x', ':BufferClose<CR>', { noremap = true, silent = true })
   end,
 }
