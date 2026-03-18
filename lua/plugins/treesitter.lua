@@ -7,7 +7,6 @@ return {
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
           "lua",
-          "swift",
           "python",
           "go",
           "javascript",
