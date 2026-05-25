@@ -10,7 +10,7 @@ return {
       close_on_exit = true,
       hide_numbers = true,
       on_open = function(term)
-local opts = {noremap = true, silent = true, buffer = term.bufnr}
+        local opts = { noremap = true, silent = true, buffer = term.bufnr }
         vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], opts)
         vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], opts)
         vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], opts)
@@ -20,7 +20,7 @@ local opts = {noremap = true, silent = true, buffer = term.bufnr}
       end,
     },
     keys = {
-{ "<leader>t", function() require("toggleterm").toggle(1) end, desc = "Toggle Terminal" },
+      { "<leader>t", function() require("toggleterm").toggle(1) end, desc = "Toggle Terminal" },
     },
     config = function(_, opts)
       require("toggleterm").setup(opts)

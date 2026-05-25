@@ -64,13 +64,16 @@ return {
         if not ok or not lines or not lines[lnum] then
           return false
         end
+
         local line = lines[lnum]
+
         return line:match("^%s*import%s") ~= nil
             or line:match("^%s*export%s+.*from%s") ~= nil
       end
 
       local function score_location(loc)
         local uri = loc.uri or loc.targetUri
+
         if not uri then
           return -math.huge
         end
@@ -78,11 +81,13 @@ return {
         local range = loc.range or loc.targetSelectionRange or loc.targetRange
         local fname = uri_to_fname(uri)
         local lnum = (range and range.start and range.start.line or 0) + 1
+
         local score = 0
 
         if fname:match("%.vue$") then
           score = score + 120
         end
+
         if fname:match("%.ts$") or fname:match("%.js$") then
           score = score + 80
         end
@@ -90,13 +95,18 @@ return {
         if fname:match("%.d%.ts$") then
           score = score - 200
         end
+
         if fname:match("shims%-vue%.d%.ts$") or fname:match("env%.d%.ts$") then
           score = score - 300
         end
+
         if fname:match("/node_modules/") then
           score = score - 120
         end
-        if fname:match("/%.nuxt/") or fname:match("/%.vite/") or fname:match("/dist/") then
+
+        if fname:match("/%.nuxt/")
+            or fname:match("/%.vite/")
+            or fname:match("/dist/") then
           score = score - 100
         end
 
@@ -114,6 +124,7 @@ return {
         for _, loc in ipairs(locs) do
           local uri = loc.uri or loc.targetUri
           local range = loc.range or loc.targetSelectionRange or loc.targetRange
+
           if uri and range and range.start then
             local key = table.concat({
               uri,
@@ -142,74 +153,111 @@ return {
         end
 
         if #locations == 1 then
-          vim.lsp.util.show_document(locations[1], position_encoding, { reuse_win = true })
+          vim.lsp.util.show_document(
+            locations[1],
+            position_encoding,
+            { reuse_win = true }
+          )
         else
-          vim.fn.setqflist(vim.lsp.util.locations_to_items(locations, position_encoding))
+          vim.fn.setqflist(
+            vim.lsp.util.locations_to_items(
+              locations,
+              position_encoding
+            )
+          )
+
           vim.cmd("copen")
         end
       end
 
       local function smart_vue_definition(bufnr)
-        local clients = vim.lsp.get_clients({ bufnr = bufnr, name = "vue_ls" })
-        local client = clients[1] or vim.lsp.get_clients({ bufnr = bufnr })[1]
+        local clients = vim.lsp.get_clients({
+          bufnr = bufnr,
+          name = "vue_ls",
+        })
+
+        local client =
+            clients[1] or vim.lsp.get_clients({ bufnr = bufnr })[1]
+
         local position_encoding = get_client_encoding(client)
-        local params = vim.lsp.util.make_position_params(0, position_encoding)
 
-        vim.lsp.buf_request_all(bufnr, "textDocument/definition", params, function(results)
-          local all = {}
+        local params =
+            vim.lsp.util.make_position_params(0, position_encoding)
 
-          for _, res in pairs(results or {}) do
-            if res.result then
-              if vim.islist(res.result) then
-                vim.list_extend(all, res.result)
-              else
-                table.insert(all, res.result)
+        vim.lsp.buf_request_all(
+          bufnr,
+          "textDocument/definition",
+          params,
+          function(results)
+            local all = {}
+
+            for _, res in pairs(results or {}) do
+              if res.result then
+                if vim.islist(res.result) then
+                  vim.list_extend(all, res.result)
+                else
+                  table.insert(all, res.result)
+                end
               end
             end
-          end
 
-          all = dedupe_locations(all)
+            all = dedupe_locations(all)
 
-          if vim.tbl_isempty(all) then
-            vim.notify("No definition found", vim.log.levels.INFO)
-            return
-          end
-
-          table.sort(all, function(a, b)
-            return score_location(a) > score_location(b)
-          end)
-
-          local best_score = score_location(all[1])
-
-          if #all > 1 and best_score < 0 then
-            tb.lsp_definitions({
-              layout_strategy = "horizontal",
-              layout_config = {
-                horizontal = { preview_width = 0.6 },
-                width = 0.95,
-                height = 0.90,
-              },
-              path_display = { "filename_first" },
-            })
-            return
-          end
-
-          local top = {}
-          local top_score = score_location(all[1])
-
-          for _, loc in ipairs(all) do
-            if score_location(loc) >= top_score - 40 then
-              table.insert(top, loc)
+            if vim.tbl_isempty(all) then
+              vim.notify("No definition found", vim.log.levels.INFO)
+              return
             end
-          end
 
-          open_locations(top, position_encoding)
-        end)
+            table.sort(all, function(a, b)
+              return score_location(a) > score_location(b)
+            end)
+
+            local best_score = score_location(all[1])
+
+            if #all > 1 and best_score < 0 then
+              tb.lsp_definitions({
+                layout_strategy = "horizontal",
+                layout_config = {
+                  horizontal = { preview_width = 0.6 },
+                  width = 0.95,
+                  height = 0.90,
+                },
+                path_display = { "filename_first" },
+              })
+
+              return
+            end
+
+            local top = {}
+            local top_score = score_location(all[1])
+
+            for _, loc in ipairs(all) do
+              if score_location(loc) >= top_score - 40 then
+                table.insert(top, loc)
+              end
+            end
+
+            open_locations(top, position_encoding)
+          end
+        )
       end
+
+      local telescope_opts = {
+        layout_strategy = "horizontal",
+        layout_config = {
+          horizontal = { preview_width = 0.6 },
+          width = 0.95,
+          height = 0.90,
+        },
+        path_display = { "filename_first" },
+      }
 
       local on_attach = function(client, bufnr)
         local function buf_map(mode, lhs, rhs, desc)
-          vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, desc = desc })
+          vim.keymap.set(mode, lhs, rhs, {
+            buffer = bufnr,
+            desc = desc,
+          })
         end
 
         local ft = vim.bo[bufnr].filetype
@@ -218,52 +266,51 @@ return {
         buf_map("n", "K", vim.lsp.buf.hover, "Hover")
         buf_map("n", "<leader>ca", vim.lsp.buf.code_action, "Code Action")
 
+        -- DEFINITIONS
         if client:supports_method("textDocument/definition") then
+          -- Vue smart definition
           if ft == "vue" then
             buf_map("n", "<leader>gd", function()
               smart_vue_definition(bufnr)
             end, "Smart Vue Definition")
-          else
+
+            -- TypeScript source definition
+          elseif client.name == "ts_ls" then
             buf_map("n", "<leader>gd", function()
-              local params = vim.lsp.util.make_position_params(0, position_encoding)
+              local params =
+                  vim.lsp.util.make_position_params(
+                    0,
+                    position_encoding
+                  )
 
               client:exec_cmd({
                 title = "Go to Source Definition",
                 command = "_typescript.goToSourceDefinition",
-                arguments = { params.textDocument.uri, params.position },
+                arguments = {
+                  params.textDocument.uri,
+                  params.position,
+                },
               }, { bufnr = bufnr }, function(err, result)
-                if err then
-                  tb.lsp_definitions({
-                    layout_strategy = "horizontal",
-                    layout_config = {
-                      horizontal = { preview_width = 0.6 },
-                      width = 0.95,
-                      height = 0.90,
-                    },
-                    path_display = { "filename_first" },
-                  })
-                  return
-                end
-
-                if not result or vim.tbl_isempty(result) then
-                  tb.lsp_definitions({
-                    layout_strategy = "horizontal",
-                    layout_config = {
-                      horizontal = { preview_width = 0.6 },
-                      width = 0.95,
-                      height = 0.90,
-                    },
-                    path_display = { "filename_first" },
-                  })
+                if err
+                    or not result
+                    or vim.tbl_isempty(result) then
+                  tb.lsp_definitions(telescope_opts)
                   return
                 end
 
                 open_locations(result, position_encoding)
               end)
-            end, "Go to Source Definition")
+            end, "TS Source Definition")
+
+            -- All other languages
+          else
+            buf_map("n", "<leader>gd", function()
+              tb.lsp_definitions(telescope_opts)
+            end, "Go to Definition")
           end
         end
 
+        -- REFERENCES
         if client:supports_method("textDocument/references") then
           buf_map("n", "<leader>gr", function()
             tb.lsp_references({
@@ -280,31 +327,35 @@ return {
           end, "References")
         end
 
+        -- IMPLEMENTATIONS
         if client:supports_method("textDocument/implementation") then
           buf_map("n", "<leader>gi", function()
-            tb.lsp_implementations({
-              layout_strategy = "horizontal",
-              layout_config = {
-                horizontal = { preview_width = 0.6 },
-                width = 0.95,
-                height = 0.90,
-              },
-              path_display = { "filename_first" },
-            })
+            tb.lsp_implementations(telescope_opts)
           end, "Implementations")
         end
 
+        -- DECLARATION
         if client:supports_method("textDocument/declaration") then
-          buf_map("n", "<leader>gD", vim.lsp.buf.declaration, "Go to Declaration")
+          buf_map(
+            "n",
+            "<leader>gD",
+            vim.lsp.buf.declaration,
+            "Go to Declaration"
+          )
         end
 
+        -- Vue semantic token fix
         if client.name == "ts_ls" then
           local caps = client.server_capabilities
-          if caps and caps.semanticTokensProvider and ft == "vue" then
+
+          if caps
+              and caps.semanticTokensProvider
+              and ft == "vue" then
             caps.semanticTokensProvider.full = false
           end
         end
 
+        -- clangd tweaks
         if client.name == "clangd" then
           client.server_capabilities.signatureHelpProvider = false
         end
@@ -321,6 +372,7 @@ return {
             "typescript.tsx",
             "vue",
           },
+
           init_options = {
             plugins = {
               {
@@ -338,7 +390,14 @@ return {
 
         gopls = {
           cmd = { "gopls" },
-          filetypes = { "go", "gomod", "gowork", "gotmpl" },
+
+          filetypes = {
+            "go",
+            "gomod",
+            "gowork",
+            "gotmpl",
+          },
+
           settings = {
             gopls = {
               completeUnimported = true,
@@ -381,6 +440,13 @@ return {
         },
 
         clangd = {
+          cmd = {
+            "clangd",
+            "--background-index",
+            "--clang-tidy",
+            "--completion-style=detailed",
+          },
+
           filetypes = { "c", "cpp" },
         },
 

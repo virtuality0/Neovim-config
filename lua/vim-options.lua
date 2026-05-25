@@ -25,7 +25,11 @@ vim.keymap.set('n', '<c-k>', ':wincmd k<CR>')
 vim.keymap.set('n', '<c-j>', ':wincmd j<CR>')
 vim.keymap.set('n', '<c-h>', ':wincmd h<CR>')
 vim.keymap.set('n', '<c-l>', ':wincmd l<CR>')
-vim.keymap.set('i', 'js', '<Esc>')
+vim.keymap.set('i', 'jk', '<Esc>')
+vim.keymap.set("t", "jk", [[<C-\><C-n>]], {
+  noremap = true,
+  silent = true,
+})
 
 vim.wo.number = true
 --True
