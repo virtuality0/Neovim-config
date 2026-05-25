@@ -1,166 +1,172 @@
 return {
-  {
-    "NeogitOrg/neogit",
-    cmd = "Neogit",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      "sindrets/diffview.nvim",
-      "nvim-telescope/telescope.nvim",
-    },
+	{
+		"NeogitOrg/neogit",
 
-    config = function()
-      -- DIFFVIEW
-      require("diffview").setup({
-        enhanced_diff_hl = true,
-        use_icons = true,
-        view = {
-          default = {
-            layout = "diff2_horizontal",
-          },
+		cmd = "Neogit",
 
-          merge_tool = {
-            layout = "diff3_horizontal",
-            disable_diagnostics = true,
-          },
-        },
+		keys = {
+			{
+				"<leader>gg",
+				"<cmd>Neogit<CR>",
+				desc = "Neogit",
+			},
 
-        file_panel = {
-          listing_style = "tree",
+			{
+				"<leader>gv",
+				function()
+					local lib = require("diffview.lib")
+					local view = lib.get_current_view()
 
-          win_config = {
-            position = "left",
-            width = 35,
-          },
-        },
+					if view then
+						vim.cmd("DiffviewClose")
+					else
+						vim.cmd("DiffviewOpen")
+					end
+				end,
+				desc = "Toggle Diffview",
+			},
 
-        file_history_panel = {
-          log_options = {
-            git = {
-              single_file = {
-                diff_merges = "combined",
-              },
-            },
-          },
-        },
+			{
+				"<leader>gh",
+				function()
+					local lib = require("diffview.lib")
+					local view = lib.get_current_view()
 
-        keymaps = {
-          view = {
-            ["q"] = "<cmd>DiffviewClose<CR>",
-          },
+					if view then
+						vim.cmd("DiffviewClose")
+					else
+						vim.cmd("DiffviewFileHistory %")
+					end
+				end,
+				desc = "Toggle File History",
+			},
 
-          file_panel = {
-            ["q"] = "<cmd>DiffviewClose<CR>",
-          },
-        },
-      })
+			{
+				"<leader>gm",
+				"<cmd>DiffviewOpen --imply-local<CR>",
+				desc = "Merge Conflicts",
+			},
+		},
 
-      -- NEOGIT
-      require("neogit").setup({
-        kind = "split",
+		dependencies = {
+			"nvim-lua/plenary.nvim",
+			"sindrets/diffview.nvim",
+			"nvim-telescope/telescope.nvim",
+		},
 
-        integrations = {
-          diffview = true,
-          telescope = true,
-        },
+		config = function()
+			-- DIFFVIEW
+			require("diffview").setup({
+				enhanced_diff_hl = true,
+				use_icons = true,
 
-        disable_commit_confirmation = true,
-        auto_refresh = true,
-        graph_style = "unicode",
+				view = {
+					default = {
+						layout = "diff2_horizontal",
+					},
 
-        signs = {
-          section = { "", "" },
-          item = { "", "" },
-          hunk = { "", "" },
-        },
+					merge_tool = {
+						layout = "diff3_horizontal",
+						disable_diagnostics = true,
+					},
+				},
 
-        status = {
-          recent_commit_count = 20,
-        },
+				file_panel = {
+					listing_style = "tree",
 
-        commit_editor = {
-          kind = "tab",
-        },
+					win_config = {
+						position = "left",
+						width = 35,
+					},
+				},
 
-        commit_select_view = {
-          kind = "tab",
-        },
+				file_history_panel = {
+					log_options = {
+						git = {
+							single_file = {
+								diff_merges = "combined",
+							},
+						},
+					},
+				},
 
-        commit_view = {
-          kind = "vsplit",
-        },
+				keymaps = {
+					view = {
+						["q"] = "<cmd>DiffviewClose<CR>",
+					},
 
-        log_view = {
-          kind = "tab",
-        },
+					file_panel = {
+						["q"] = "<cmd>DiffviewClose<CR>",
+					},
+				},
+			})
 
-        rebase_editor = {
-          kind = "split",
-        },
+			-- NEOGIT
+			require("neogit").setup({
+				kind = "split",
 
-        reflog_view = {
-          kind = "tab",
-        },
+				integrations = {
+					diffview = true,
+					telescope = true,
+				},
 
-        preview_buffer = {
-          kind = "split",
-        },
+				disable_commit_confirmation = true,
+				auto_refresh = true,
+				graph_style = "unicode",
 
-        popup = {
-          kind = "split",
-        },
+				signs = {
+					section = { "", "" },
+					item = { "", "" },
+					hunk = { "", "" },
+				},
 
-        mappings = {
-          status = {
-            ["q"] = "Close",
-            ["<tab>"] = "Toggle",
-            ["<cr>"] = "GoToFile",
-            ["s"] = "Stage",
-            ["u"] = "Unstage",
-            ["x"] = "Discard",
-          },
-        },
-      })
+				status = {
+					recent_commit_count = 10,
+				},
 
-      -- KEYMAPS
-      local map = vim.keymap.set
+				commit_editor = {
+					kind = "tab",
+				},
 
-      -- Open Neogit
-      map("n", "<leader>gg", "<cmd>Neogit<CR>", {
-        desc = "Neogit",
-      })
+				commit_select_view = {
+					kind = "tab",
+				},
 
-      -- Toggle working tree diff
-      map("n", "<leader>gv", function()
-        local lib = require("diffview.lib")
-        local view = lib.get_current_view()
+				commit_view = {
+					kind = "vsplit",
+				},
 
-        if view then
-          vim.cmd("DiffviewClose")
-        else
-          vim.cmd("DiffviewOpen")
-        end
-      end, {
-        desc = "Toggle Diffview",
-      })
+				log_view = {
+					kind = "tab",
+				},
 
-      -- Toggle current file history
-      map("n", "<leader>gh", function()
-        local lib = require("diffview.lib")
-        local view = lib.get_current_view()
+				rebase_editor = {
+					kind = "split",
+				},
 
-        if view then
-          vim.cmd("DiffviewClose")
-        else
-          vim.cmd("DiffviewFileHistory %")
-        end
-      end, {
-        desc = "Toggle File History",
-      })
+				reflog_view = {
+					kind = "tab",
+				},
 
-      -- Merge conflict view
-      map("n", "<leader>gm", "<cmd>DiffviewOpen --imply-local<CR>", {
-        desc = "Merge Conflicts",
-      })
-    end,
-  },
+				preview_buffer = {
+					kind = "split",
+				},
+
+				popup = {
+					kind = "split",
+				},
+
+				mappings = {
+					status = {
+						["q"] = "Close",
+						["<tab>"] = "Toggle",
+						["<cr>"] = "GoToFile",
+						["s"] = "Stage",
+						["u"] = "Unstage",
+						["x"] = "Discard",
+					},
+				},
+			})
+		end,
+	},
 }
