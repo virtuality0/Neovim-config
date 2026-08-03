@@ -16,7 +16,7 @@ return {
 					"ts_ls",
 					"vue_ls",
 					"gopls",
-					"pyright",
+					"basedpyright",
 					"html",
 					"cssls",
 					"tailwindcss",
@@ -375,7 +375,19 @@ return {
 					},
 				},
 
-				pyright = {},
+				basedpyright = {
+					settings = {
+						basedpyright = {
+							analysis = {
+								autoSearchPaths = true,
+								diagnosticMode = "openFilesOnly",
+							},
+						},
+						python = {
+							pythonPath = vim.fn.getcwd() .. "/.venv/bin/python",
+						},
+					},
+				},
 				html = {},
 				cssls = {},
 				tailwindcss = {},
