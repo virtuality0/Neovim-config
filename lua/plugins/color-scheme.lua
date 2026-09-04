@@ -1,85 +1,23 @@
 return {
-  -- {
-  --   "catppuccin/nvim",
-  --   lazy = false,
-  --   name = "catppuccin",
-  --   priority = 1000,
-  --   config = function()
-  --     vim.cmd.colorscheme "catppuccin-mocha"
-  --   end
-  -- }
-  -- {
-  --   "ellisonleao/gruvbox.nvim",
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     vim.o.background = "dark" -- or "light"
-  --     vim.cmd.colorscheme("gruvbox")
-  --   end,
-  -- }
   {
-    "rebelot/kanagawa.nvim",
+    "luisiacc/the-matrix.nvim",
     lazy = false,
     priority = 1000,
-    config = function()
-      -- Optional configuration
-      require("kanagawa").setup({
-        compile = false,
-        transparent = false,
-        dimInactive = false,
-        terminalColors = true,
-        theme = "dragon"
-      })
 
-      vim.cmd.colorscheme("kanagawa")
+    config = function()
+      vim.g.thematrix_function_style = "NONE"
+      vim.g.thematrix_keyword_style = "italic"
+
+      vim.g.thematrix_telescope_theme = 1
+      vim.g.thematrix_transparent_mode = 0
+
+      vim.cmd.colorscheme("thematrix")
+
+      -- Pure black background
+      vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
+      vim.api.nvim_set_hl(0, "NormalNC", { bg = "#000000" })
+      vim.api.nvim_set_hl(0, "SignColumn", { bg = "#000000" })
+      vim.api.nvim_set_hl(0, "EndOfBuffer", { bg = "#000000" })
     end,
   },
-  -- {
-  --   "catppuccin/nvim",
-  --   lazy = false,
-  --   name = "catppuccin",
-  --   priority = 1000,
-  --   config = function()
-  --     vim.cmd.colorscheme "catppuccin-mocha"
-  --   end
-  -- }
-  -- {
-  --   "ellisonleao/gruvbox.nvim",
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     vim.o.background = "dark" -- or "light"
-  --     vim.cmd.colorscheme("gruvbox")
-  --   end,
-  -- }
-  -- {
-  --   "rebelot/kanagawa.nvim",
-  --   lazy = false,
-  --   priority = 1000,
-  --   config = function()
-  --     require("kanagawa").setup({
-  --       theme = "dragon", -- "wave", "dragon", or "lotus"
-  --
-  --       compile = true,
-  --       transparent = false,
-  --       terminalColors = true,
-  --
-  --       commentStyle = { italic = true },
-  --       keywordStyle = { italic = true },
-  --       statementStyle = { bold = true },
-  --
-  --       colors = {
-  --         theme = {
-  --           all = {
-  --             ui = {
-  --               bg_gutter = "none", -- cleaner sign column
-  --             },
-  --           },
-  --         },
-  --       },
-  --     })
-  --
-  --     vim.cmd.colorscheme("kanagawa-dragon")
-  --   end,
-  -- },
 }
